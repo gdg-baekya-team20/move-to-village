@@ -4,9 +4,6 @@ name: Jimkanman CI/DE Java with Gradle (on develop branch)
 on:
   push:
     branches: [ "develop" ]
-  pull_request:
-    branches:
-      - develop # 되는지 테스트용 (머지 전에 삭제)
 
 permissions:
   contents: read

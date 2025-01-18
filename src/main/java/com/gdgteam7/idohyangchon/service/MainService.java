@@ -14,7 +14,7 @@ import java.util.Arrays;
 @Service
 @RequiredArgsConstructor
 public class MainService {
-    RuralAreaRepository repository;
+    private final RuralAreaRepository repository;
     public CostResponseDto calculateCost(int familyCount, int foodCost, int transportationCost, int housingCost) {
         // 랜덤 지역 + 서울 가져옴
         RuralArea area = repository.findRandomExcludingSuch("서울특별시");

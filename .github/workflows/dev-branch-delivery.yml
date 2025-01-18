@@ -3,7 +3,7 @@ name: Jimkanman CI/DE Java with Gradle (on develop branch)
 
 on:
   push:
-    branches: [ "develop" ]
+    branches: [ "develop", "dev" ]
 
 permissions:
   contents: read

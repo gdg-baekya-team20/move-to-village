@@ -1,5 +1,7 @@
 package com.gdgteam7.idohyangchon.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gdgteam7.idohyangchon.domain.RuralArea;
 import com.gdgteam7.idohyangchon.dto.CostResponseDto;
 import com.gdgteam7.idohyangchon.dto.RecommendationRequestDto;
@@ -10,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -33,23 +37,52 @@ public class MainService {
         return new CostResponseDto(currentCost, futureCost, savedPercentage, budgetItems);
     }
 
-    public RecommendationResponseDto recommendRural(RecommendationRequestDto request) {
+    public RecommendationResponseDto recommendRural(RecommendationRequestDto request) throws JsonProcessingException {
         // 일단 String을 Enum으로 매핑할까
         String purpose = request.getPurpose();
         Priorities[] priorities = Arrays.stream(request.getPriorities())
                 .map(Priorities::valueOf)
                 .toArray(Priorities[]::new);
 
-        // AI 결과 가져오면
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("purpose", purpose);
+        requestMap.put("priorities", Arrays.stream(priorities)
+                .map(Enum::name)
+                .toArray(String[]::new));
 
+        String jsonString2 = objectMapper.writeValueAsString(requestMap);
+
+
+        // AI 결과 가져오면
+        String aiResult = "이주목적: 일자리, 우선순위: 교통, 의료시설, 자연환경, 기타조건: 아이들 교육 중요, 추천지역: 여수, 이유: 여수는 화학·관광 분야 일자리가 있으며, 해양환경과 병원 인프라가 아이 교육에도 적합합니다.";
+
+        String ruralName = null;
+        String ruralDescription = null;
+
+        String[] keyValuePairs = aiResult.split(", ");
+        for (String pair : keyValuePairs) {
+            if (pair.startsWith("추천지역:")) {
+                ruralName = pair.substring(pair.indexOf("추천지역:") + 5).trim();
+            } else if (pair.startsWith("이유:")) {
+                ruralDescription = pair.substring(pair.indexOf("이유:") + 3).trim();
+            }
+        }
 
         // 거기서 이름 가져오고
         // 이름으로 DB에서 엔티티 가져와서
+        RuralArea ruralArea = repository.findByRuralName(ruralName);
+
         // 필요한 부분 채우고 리턴
+        RecommendationResponseDto responseDto = new RecommendationResponseDto();
+        responseDto.setRuralName(ruralArea.getRuralName());
+        responseDto.setRuralThumbnailUrl(ruralArea.getThumbnailUrl());
+        responseDto.setHousingCost(ruralArea.getHousingCost());
+        responseDto.setFoodCost(ruralArea.getFoodCost());
+        responseDto.setTransportationCost(ruralArea.getTransportationCost());
+        responseDto.setRuralUrl(ruralArea.getLocalGovernmentUrl());
 
-
-
-        return new RecommendationResponseDto();
+        return responseDto;
     }
 
     private CostResponseDto.BudgetItem[] getRelevantItemOverTime(int savedAmountPerMonth) {

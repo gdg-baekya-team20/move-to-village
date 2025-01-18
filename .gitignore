@@ -37,3 +37,6 @@ application.yml
 
 ### VS Code ###
 .vscode/
+
+application*.yml
+

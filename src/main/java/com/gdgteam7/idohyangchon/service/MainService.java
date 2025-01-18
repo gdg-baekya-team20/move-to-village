@@ -28,7 +28,7 @@ public class MainService {
         // 할인율 계산
         int savedPercentage = (int) ((float) (currentCost - futureCost) / currentCost * 100);
 
-        CostResponseDto.BudgetItem[] budgetItems = getRelevantItemOverTime(futureCost - currentCost);
+        CostResponseDto.BudgetItem[] budgetItems = getRelevantItemOverTime(currentCost - futureCost);
 
         return new CostResponseDto(currentCost, futureCost, savedPercentage, budgetItems);
     }
@@ -55,9 +55,12 @@ public class MainService {
     private CostResponseDto.BudgetItem[] getRelevantItemOverTime(int savedAmountPerMonth) {
         CostResponseDto.BudgetItem[] items = new CostResponseDto.BudgetItem[3];
         int savedAmountPerYear = savedAmountPerMonth * 12;
+
         int[] years = {1, 5, 20};
         for(int i = 0; i < 3; i++) {
+            System.out.println("budget: " + savedAmountPerYear * years[i]);
             items[i] = getRelevantItemByBudget(savedAmountPerYear * years[i]);
+            System.out.println("-> " + items[i].getName());
         }
         return items;
     }

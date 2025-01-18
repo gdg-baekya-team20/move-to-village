@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface RuralAreaRepository extends JpaRepository<RuralArea, Long> {
     @Query(value = "SELECT * FROM rural_area " +
-            "WHERE rural_name != :word " +
+            "WHERE rural_name != :ruralName " +
             "ORDER BY RAND() LIMIT 1",
             nativeQuery = true)
     RuralArea findRandomExcludingSuch(@Param("ruralName") String ruralName);
